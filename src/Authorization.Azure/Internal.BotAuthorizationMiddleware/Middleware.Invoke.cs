@@ -28,7 +28,7 @@ partial class BotAuthorizationMiddleware
             return await botContext.BotFlow.NextAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        return botContext.TurnContext.IsTeamsChannel() switch
+        return botContext.TurnContext.IsMsteamsChannel() switch
         {
             true => await AuthorizeInTeamsAsync(botContext, cancellationToken).ConfigureAwait(false),
             _ => await AuthorizeNotTeamsAsync(botContext, cancellationToken).ConfigureAwait(false)

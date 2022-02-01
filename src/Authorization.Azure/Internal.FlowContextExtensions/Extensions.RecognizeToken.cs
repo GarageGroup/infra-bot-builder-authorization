@@ -13,18 +13,17 @@ partial class OAuthFlowContextExtensions
     internal static ValueTask<Result<TokenResponse, BotFlowFailure>> RecognizeTokenOrFailureAsync(
         this IOAuthFlowContext context, string connectionName, CancellationToken cancellationToken)
     {
-        var activity = context.Activity;
-        if (activity.IsNotMessageType())
+        if (context.IsNotMessageType())
         {
             return GetUnsuccessfulTokenFailureResultAsync();
         }
 
-        if (string.IsNullOrEmpty(activity.Text))
+        if (string.IsNullOrEmpty(context.Activity.Text))
         {
             return GetUnsuccessfulTokenFailureResultAsync();
         }
 
-        var matchedMagicCode = Regex.Match(input: activity.Text, pattern: @"(\d{6})");
+        var matchedMagicCode = Regex.Match(input: context.Activity.Text, pattern: @"(\d{6})");
         if (matchedMagicCode.Success is false)
         {
             return GetUnsuccessfulTokenFailureResultAsync();
