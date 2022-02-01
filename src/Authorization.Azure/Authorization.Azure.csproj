@@ -8,14 +8,14 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RootNamespace>GGroupp.Infra.Bot.Builder</RootNamespace>
     <AssemblyName>GGroupp.Infra.Bot.Builder.Authorization.Azure</AssemblyName>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="GGroupp.Infra.Bot.Builder.Core" Version="1.2.0" />
     <PackageReference Include="GGroupp.Infra.Bot.Builder.FlowFailure" Version="1.0.0" />
     <PackageReference Include="GGroupp.Infra.Bot.Builder.Telegram.ChannelData" Version="1.0.0" />
-    <PackageReference Include="GGroupp.Infra.Bot.Builder.TurnContext.Extensions" Version="1.0.0" />
+    <PackageReference Include="GGroupp.Infra.Bot.Builder.TurnContext.Extensions" Version="1.0.1" />
     <PackageReference Include="GGroupp.Platform.Azure.AzureUser.Get.InOut" Version="1.0.0" />
     <PackageReference Include="PrimeFuncPack.Core.Failure" Version="2.0.0" />
   </ItemGroup>
