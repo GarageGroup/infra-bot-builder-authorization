@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Connector;
 
 namespace GGroupp.Infra.Bot.Builder;
 
@@ -16,6 +19,21 @@ internal static partial class OAuthFlowContextExtensions
     private const string EnterButtonTitle = "Вход";
 
     private const string EnterText = "Войдите в свою учетную запись";
+
+    private static readonly IReadOnlyCollection<string> notSupportedChannles;
+
+    static OAuthFlowContextExtensions()
+        =>
+        notSupportedChannles = new[]
+        {
+            Channels.Cortana,
+            Channels.Skype,
+            Channels.Skypeforbusiness
+        };
+
+    private static bool IsChannelNotSupported(this ITurnContext turnContext)
+        =>
+        notSupportedChannles.Contains(turnContext.Activity.ChannelId, StringComparer.InvariantCultureIgnoreCase);
 
     private static Result<IExtendedUserTokenProvider, BotFlowFailure> GetUserTokenPrividerOrFailure(this IOAuthFlowContext context)
     {

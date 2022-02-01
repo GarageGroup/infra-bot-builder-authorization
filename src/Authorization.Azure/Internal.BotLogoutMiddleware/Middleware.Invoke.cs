@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
+using Newtonsoft.Json.Linq;
 
 namespace GGroupp.Infra.Bot.Builder;
 
@@ -16,10 +17,10 @@ partial class BotLogoutMiddleware
             return ValueTask.FromCanceled<Unit>(cancellationToken);
         }
 
-        return botContext.TurnContext.IsTeamsChannel() switch
+        return botContext.TurnContext.IsMsteamsChannel() switch
         {
             true => InnerNextAsync(),
-            _ => botContext.TurnContext.Activity.RecognizeCommandOrAbsent(commandName).FoldValueAsync(InnerLogoutAsync, InnerNextAsync)
+            _ => botContext.TurnContext.RecognizeCommandOrAbsent(commandName).FoldValueAsync(InnerLogoutAsync, InnerNextAsync)
         };
 
         ValueTask<Unit> InnerLogoutAsync(string _)
@@ -48,12 +49,21 @@ partial class BotLogoutMiddleware
         await botContext.ConversationState.ClearStateAsync(botContext.TurnContext, cancellationToken).ConfigureAwait(false);
 
         var successActivity = MessageFactory.Text("Вы вышли из учетной записи");
-        if (botContext.TurnContext.Activity.IsTelegram())
+        if (botContext.TurnContext.IsTelegramChannel())
         {
-            successActivity = successActivity.SetReplyTelegramKeyboardRemoveChannelData();
+            successActivity.ChannelData = CreateTelegramChannelData();
         }
 
         _ = await botContext.TurnContext.SendActivityAsync(successActivity, cancellationToken).ConfigureAwait(false);
         return default;
     }
+
+    private static JObject CreateTelegramChannelData()
+        =>
+        new TelegramChannelData(
+            parameters: new()
+            {
+                ReplyMarkup = new TelegramReplyKeyboardRemove()
+            })
+        .ToJObject();
 }

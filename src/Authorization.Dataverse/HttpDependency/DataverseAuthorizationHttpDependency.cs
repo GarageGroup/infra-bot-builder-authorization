@@ -1,7 +1,5 @@
 using System;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using PrimeFuncPack;
 
 namespace GGroupp.Infra.Bot.Builder;
@@ -20,12 +18,6 @@ public static class DataverseAuthorizationHttpDependency
         Dependency<THttpHandler> dependency, IBotContext botContext)
         where THttpHandler : HttpMessageHandler
         =>
-        dependency.UseCallerId(
-            _ => AsyncValueFunc.From(botContext.GetUserIdAsync));
-
-    private static async ValueTask<Guid> GetUserIdAsync(this IBotContext context, CancellationToken cancellationToken)
-    {
-        var botUser = await context.BotUserProvider.GetCurrentUserAsync(cancellationToken).ConfigureAwait(false);
-        return botUser?.GetDataverseUserIdOrAbsent().OrDefault() ?? default;
-    }
+        dependency.UseDataverseImpersonation(
+            _ => CallerIdProvider.InternalCreate(botContext.BotUserProvider));
 }
