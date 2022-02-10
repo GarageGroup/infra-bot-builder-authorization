@@ -10,7 +10,7 @@ internal sealed partial class BotDataverseUserGetFunc : IBotUserGetFunc
 {
     private const string UserNotFoundFailureMessage
         =
-        "Пользователь не найден. Возомжно у вас нет прав для доступа в систему";
+        "Пользователь не найден. Возможно у вас нет прав для доступа в систему";
 
     private const string UnexpectedFailureMessage
         =
