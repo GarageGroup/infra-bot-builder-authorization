@@ -15,4 +15,28 @@ public static class LogoutBotBuilder
             =>
             new BotLogoutMiddleware(commandName).InvokeAsync(context, token);
     }
+
+    public static IBotBuilder UseLogout(this IBotBuilder botBuilder, string commandName, Func<IBotContext, BotLogoutOption> optionResolver)
+    {
+        _ = botBuilder ?? throw new ArgumentNullException(nameof(botBuilder));
+        _ = optionResolver ?? throw new ArgumentNullException(nameof(optionResolver));
+
+        return botBuilder.Use(InnerInvokeAsync);
+
+        ValueTask<Unit> InnerInvokeAsync(IBotContext context, CancellationToken token)
+            =>
+            new BotLogoutMiddleware(commandName, optionResolver.Invoke(context)).InvokeAsync(context, token);
+    }
+
+    public static IBotBuilder UseLogout(this IBotBuilder botBuilder, string commandName, Func<BotLogoutOption> optionFactory)
+    {
+        _ = botBuilder ?? throw new ArgumentNullException(nameof(botBuilder));
+        _ = optionFactory ?? throw new ArgumentNullException(nameof(optionFactory));
+
+        return botBuilder.Use(InnerInvokeAsync);
+
+        ValueTask<Unit> InnerInvokeAsync(IBotContext context, CancellationToken token)
+            =>
+            new BotLogoutMiddleware(commandName, optionFactory.Invoke()).InvokeAsync(context, token);
+    }
 }

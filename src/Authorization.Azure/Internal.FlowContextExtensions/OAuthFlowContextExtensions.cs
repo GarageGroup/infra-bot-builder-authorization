@@ -8,18 +8,6 @@ namespace GGroupp.Infra.Bot.Builder;
 
 internal static partial class OAuthFlowContextExtensions
 {
-    private const string UnsuccessfulTokenFailureMessage
-        =
-        "Не удалось авторизоваться. Повторите попытку";
-
-    private const string UnexpectedFailureMessage
-        =
-        "Возникла непредвиденная ошибка при попытке получить данные пользователя. Повторите попытку позже или обратитесь к администратору";
-
-    private const string EnterButtonTitle = "Вход";
-
-    private const string EnterText = "Войдите в свою учетную запись";
-
     private static readonly IReadOnlyCollection<string> notSupportedChannles;
 
     static OAuthFlowContextExtensions()
@@ -35,7 +23,8 @@ internal static partial class OAuthFlowContextExtensions
         =>
         notSupportedChannles.Contains(turnContext.Activity.ChannelId, StringComparer.InvariantCultureIgnoreCase);
 
-    private static Result<IExtendedUserTokenProvider, BotFlowFailure> GetUserTokenPrividerOrFailure(this IOAuthFlowContext context)
+    private static Result<IExtendedUserTokenProvider, BotFlowFailure> GetUserTokenPrividerOrFailure(
+        this IOAuthFlowContext context, BotAuthorizationOption option)
     {
         if (context.Adapter is IExtendedUserTokenProvider adapter)
         {
@@ -43,7 +32,7 @@ internal static partial class OAuthFlowContextExtensions
         }
 
         return new BotFlowFailure(
-            userMessage: UnexpectedFailureMessage,
+            userMessage: option.UnexpectedFailureMessage,
             logMessage: "UserTokenClient must be specified in the turn state");
     }
 }
