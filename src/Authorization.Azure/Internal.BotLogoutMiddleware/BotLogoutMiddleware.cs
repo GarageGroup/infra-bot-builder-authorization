@@ -9,7 +9,11 @@ internal sealed partial class BotLogoutMiddleware : IAsyncValueFunc<IBotContext,
 
     private readonly string commandName;
 
-    internal BotLogoutMiddleware([AllowNull] string commandName = DefaultCommandName)
-        =>
+    private readonly BotLogoutOption logoutOption;
+
+    internal BotLogoutMiddleware([AllowNull] string commandName = DefaultCommandName, [AllowNull] BotLogoutOption logoutOption = null)
+    {
         this.commandName = string.IsNullOrEmpty(commandName) ? DefaultCommandName : commandName;
+        this.logoutOption = logoutOption ?? new();
+    }
 }

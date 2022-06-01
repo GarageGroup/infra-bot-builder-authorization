@@ -23,7 +23,7 @@ partial class BotAuthorizationMiddleware
 
     private async ValueTask<Unit> InnerInvokeAsync(IBotContext botContext, CancellationToken cancellationToken)
     {
-        if (await IsAlreadyAuthorizedAsync(botContext.BotUserProvider, cancellationToken).ConfigureAwait(false))
+        if (await IsUserAlreadyAuthorizedAsync(botContext.BotUserProvider, cancellationToken).ConfigureAwait(false))
         {
             return await botContext.BotFlow.NextAsync(cancellationToken).ConfigureAwait(false);
         }
@@ -35,16 +35,14 @@ partial class BotAuthorizationMiddleware
         };
     }
 
-    private static async ValueTask<bool> IsAlreadyAuthorizedAsync(IBotUserProvider botUserProvider, CancellationToken cancellationToken)
-    {
-        var currentUser = await botUserProvider.GetCurrentUserAsync(cancellationToken).ConfigureAwait(false);
-        return currentUser is not null;
-    }
+    private static async ValueTask<bool> IsUserAlreadyAuthorizedAsync(IBotUserProvider botUserProvider, CancellationToken cancellationToken)
+        =>
+        await botUserProvider.GetCurrentUserAsync(cancellationToken).ConfigureAwait(false) is not null;
 
     private async ValueTask<Unit> AuthorizeInTeamsAsync(IBotContext botContext, CancellationToken cancellationToken)
     {
         var flowContext = CreateFlowContext(botContext);
-        var teamsResult = await flowContext.AuthorizeInTeamsAsync(botUserGetFunc, cancellationToken).ConfigureAwait(false);
+        var teamsResult = await flowContext.AuthorizeInTeamsAsync(botUserGetFunc, option, cancellationToken).ConfigureAwait(false);
 
         return await teamsResult.FoldValueAsync(NextForTeamsAsync, InnerOnFailureAsync).ConfigureAwait(false);
 
@@ -62,12 +60,14 @@ partial class BotAuthorizationMiddleware
     private async ValueTask<Unit> AuthorizeNotTeamsAsync(IBotContext botContext, CancellationToken cancellationToken)
     {
         var flowContext = CreateFlowContext(botContext);
+
         var sourceActivityAccessor = botContext.UserState.CreateProperty<Activity?>("__authSourceActivity");
+        var oAuthCardResourceAccessor = botContext.UserState.CreateProperty<ResourceResponse?>("__authCardResource");
 
         var sourceActivity = await sourceActivityAccessor.GetAsync(flowContext, default, cancellationToken).ConfigureAwait(false);
         if (sourceActivity is not null)
         {
-            var tokenResult = await flowContext.RecognizeTokenOrFailureAsync(option.OAuthConnectionName, cancellationToken).ConfigureAwait(false);
+            var tokenResult = await flowContext.RecognizeTokenOrFailureAsync(option, cancellationToken).ConfigureAwait(false);
             var sendFailureResult = await tokenResult.MapFailureValueAsync(InnerOnFailureAsync).ConfigureAwait(false);
 
             return await sendFailureResult.FoldValueAsync(AzureAuthAsync, SendOAuthCardOrBreakAsync).ConfigureAwait(false);
@@ -79,32 +79,76 @@ partial class BotAuthorizationMiddleware
         async ValueTask<Unit> AzureAuthAsync(TokenResponse tokenResponse)
         {
             var azureResult = await flowContext.AuthorizeInAzureAsync(
-                azureUserGetFunc, botUserGetFunc, tokenResponse, cancellationToken).ConfigureAwait(false);
+                azureUserGetFunc, botUserGetFunc, tokenResponse, option, cancellationToken).ConfigureAwait(false);
 
             return await azureResult.FoldValueAsync(NextAsync, BreakAsync).ConfigureAwait(false);
         }
 
         async ValueTask<Unit> NextAsync(BotUser botUser)
         {
-            var activity = MessageFactory.Text($"{botUser.DisplayName}, авторизация прошла успешно!");
-            _ = await flowContext.SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
+            var activity = MessageFactory.Text(option.SuccessMessageFactory.Invoke(botUser));
+            var successActivityTask = flowContext.SendActivityAsync(activity, cancellationToken);
 
-            _ = await botContext.BotUserProvider.SetCurrentUserAsync(botUser, cancellationToken).ConfigureAwait(false);
+            var replaceOAuthCardTask = ReplaceOAuthCardResourceAsync(default).AsTask();
+            await Task.WhenAll(successActivityTask, replaceOAuthCardTask).ConfigureAwait(false);
 
-            await sourceActivityAccessor.DeleteAsync(flowContext, cancellationToken).ConfigureAwait(false);
+            var setCurrentUserTask = botContext.BotUserProvider.SetCurrentUserAsync(botUser, cancellationToken).AsTask();
+            var clearCacheTask = ClearCacheAsync();
+
+            await Task.WhenAll(setCurrentUserTask, clearCacheTask).ConfigureAwait(false);
             return await botContext.BotFlow.NextAsync(sourceActivity, cancellationToken).ConfigureAwait(false);
         }
 
         async ValueTask<Unit> SendOAuthCardOrBreakAsync(Unit _)
         {
-            var sendResult = await flowContext.SendOAuthCardOrFailureAsync(option.OAuthConnectionName, cancellationToken).ConfigureAwait(false);
-            return await sendResult.FoldValueAsync(ValueTask.FromResult, BreakAsync).ConfigureAwait(false);
+            var sendResult = await flowContext.SendOAuthCardOrFailureAsync(option, cancellationToken).ConfigureAwait(false);
+            return await sendResult.FoldValueAsync(SaveOAuthCardResourceAsync, BreakAsync).ConfigureAwait(false);
         }
 
         async ValueTask<Unit> BreakAsync(BotFlowFailure flowFailure)
         {
-            await sourceActivityAccessor.DeleteAsync(flowContext, cancellationToken).ConfigureAwait(false);
-            return await InnerOnFailureAsync(flowFailure).ConfigureAwait(false);
+            var unit = await ReplaceOAuthCardResourceAsync(default).ConfigureAwait(false);
+
+            var clearCacheTask = ClearCacheAsync();
+            var onFailureTask = InnerOnFailureAsync(flowFailure).AsTask();
+
+            await Task.WhenAll(clearCacheTask, onFailureTask).ConfigureAwait(false);
+            return unit;
+        }
+
+        async ValueTask<Unit> SaveOAuthCardResourceAsync(ResourceResponse? oAuthCardResource)
+        {
+            var unit = await ReplaceOAuthCardResourceAsync(default).ConfigureAwait(false);
+            await oAuthCardResourceAccessor.SetAsync(flowContext, oAuthCardResource, cancellationToken).ConfigureAwait(false);
+            return unit;
+        }
+
+        async ValueTask<Unit> ReplaceOAuthCardResourceAsync(Unit unit)
+        {
+            if (flowContext.IsNotTelegramChannel())
+            {
+                return unit;
+            }
+
+            var resource = await oAuthCardResourceAccessor.GetAsync(flowContext, null, cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrEmpty(resource?.Id))
+            {
+                return unit;
+            }
+
+            var oAuthCardMessage = MessageFactory.Text(option.EnterText);
+            oAuthCardMessage.Id = resource.Id;
+
+            _ = await flowContext.UpdateActivityAsync(oAuthCardMessage, cancellationToken).ConfigureAwait(false);
+            return unit;
+        }
+
+        Task ClearCacheAsync()
+        {
+            var clearOAuthCardCacheTask = oAuthCardResourceAccessor.DeleteAsync(flowContext, cancellationToken);
+            var clearSourceActivityCacheTask = sourceActivityAccessor.DeleteAsync(flowContext, cancellationToken);
+
+            return Task.WhenAll(clearOAuthCardCacheTask, clearSourceActivityCacheTask);
         }
 
         ValueTask<Unit> InnerOnFailureAsync(BotFlowFailure failure)

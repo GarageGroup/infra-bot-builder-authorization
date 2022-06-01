@@ -32,12 +32,12 @@ partial class BotLogoutMiddleware
             botContext.BotFlow.NextAsync(cancellationToken);
     }
 
-    private static async ValueTask<Unit> LogoutAsync(IBotContext botContext, CancellationToken cancellationToken)
+    private async ValueTask<Unit> LogoutAsync(IBotContext botContext, CancellationToken cancellationToken)
     {
         var user = await botContext.BotUserProvider.GetCurrentUserAsync(cancellationToken).ConfigureAwait(false);
         if (user is null)
         {
-            var activity = MessageFactory.Text("Вы не авторизованы");
+            var activity = MessageFactory.Text(logoutOption.UserNotAuthorizedMessage);
             _ = await botContext.TurnContext.SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
 
             return default;
@@ -48,7 +48,7 @@ partial class BotLogoutMiddleware
         await botContext.UserState.ClearStateAsync(botContext.TurnContext, cancellationToken).ConfigureAwait(false);
         await botContext.ConversationState.ClearStateAsync(botContext.TurnContext, cancellationToken).ConfigureAwait(false);
 
-        var successActivity = MessageFactory.Text("Вы вышли из учетной записи");
+        var successActivity = MessageFactory.Text(logoutOption.SuccessMessage);
         if (botContext.TurnContext.IsTelegramChannel())
         {
             successActivity.ChannelData = CreateTelegramChannelData();

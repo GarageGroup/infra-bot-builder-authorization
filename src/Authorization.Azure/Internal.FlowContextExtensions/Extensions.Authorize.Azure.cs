@@ -16,6 +16,7 @@ partial class OAuthFlowContextExtensions
         IAzureUserGetFunc azureUserGetFunc,
         IBotUserGetFunc botUserGetFunc,
         TokenResponse tokenResponse,
+        BotAuthorizationOption option,
         CancellationToken cancellationToken)
     {
         var azureIn = new AzureUserMeGetIn(tokenResponse.Token);
@@ -27,10 +28,10 @@ partial class OAuthFlowContextExtensions
             =>
             botUserGetFunc.InvokeAsync(azureUser, cancellationToken);
 
-        static BotFlowFailure MapFailure(Failure<AzureUserGetFailureCode> failure)
+        BotFlowFailure MapFailure(Failure<AzureUserGetFailureCode> failure)
             =>
             new(
-                userMessage: UnexpectedFailureMessage,
+                userMessage: option.UnexpectedFailureMessage,
                 logMessage: $"Azure authoriation has failed with message: {failure.FailureMessage}");
     }
 }

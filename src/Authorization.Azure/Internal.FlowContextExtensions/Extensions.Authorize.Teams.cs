@@ -12,7 +12,7 @@ using IBotUserGetFunc = IAsyncValueFunc<AzureUserGetOut, Result<BotUser, BotFlow
 partial class OAuthFlowContextExtensions
 {
     internal static async ValueTask<Result<BotUser, BotFlowFailure>> AuthorizeInTeamsAsync(
-        this IOAuthFlowContext context, IBotUserGetFunc botUserGetFunc, CancellationToken cancellationToken)
+        this IOAuthFlowContext context, IBotUserGetFunc botUserGetFunc, BotAuthorizationOption option, CancellationToken cancellationToken)
     {
         var logger = context.GetLogger();
 
@@ -24,7 +24,7 @@ partial class OAuthFlowContextExtensions
             if (member is null)
             {
                 return new BotFlowFailure(
-                    userMessage: UnexpectedFailureMessage,
+                    userMessage: option.UnexpectedFailureMessage,
                     logMessage: $"Teams member cannot be found by Id: {memberId}");
             }
 
@@ -39,7 +39,7 @@ partial class OAuthFlowContextExtensions
         {
             logger.LogError(ex, "Authorization in Teams has finished with an unexpected exception");
             return new BotFlowFailure(
-                userMessage: UnexpectedFailureMessage);
+                userMessage: option.UnexpectedFailureMessage);
         }
     }
 }

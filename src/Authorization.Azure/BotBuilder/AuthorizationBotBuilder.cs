@@ -23,6 +23,27 @@ public static class AuthorizationBotBuilder
         _ = azureUserGetFuncResolver ?? throw new ArgumentNullException(nameof(azureUserGetFuncResolver));
         _ = botUserGetFuncResolver ?? throw new ArgumentNullException(nameof(botUserGetFuncResolver));
 
+        return InnerUseAuthorization(botBuilder, optionResolver, azureUserGetFuncResolver, botUserGetFuncResolver);
+    }
+
+    public static IBotBuilder UseAuthorization(
+        this IBotBuilder botBuilder,
+        Func<IBotContext, BotAuthorizationOption> optionResolver,
+        Func<IBotContext, IAzureUserGetFunc> azureUserGetFuncResolver)
+    {
+        _ = botBuilder ?? throw new ArgumentNullException(nameof(botBuilder));
+        _ = optionResolver ?? throw new ArgumentNullException(nameof(optionResolver));
+        _ = azureUserGetFuncResolver ?? throw new ArgumentNullException(nameof(azureUserGetFuncResolver));
+
+        return InnerUseAuthorization(botBuilder, optionResolver, azureUserGetFuncResolver);
+    }
+
+    private static IBotBuilder InnerUseAuthorization(
+        IBotBuilder botBuilder,
+        Func<IBotContext, BotAuthorizationOption> optionResolver,
+        Func<IBotContext, IAzureUserGetFunc> azureUserGetFuncResolver,
+        Func<IBotContext, IBotUserGetFunc>? botUserGetFuncResolver = null)
+    {
         return botBuilder.Use(InnerInvokeAsync);
 
         ValueTask<Unit> InnerInvokeAsync(IBotContext context, CancellationToken token)
@@ -33,7 +54,7 @@ public static class AuthorizationBotBuilder
             =>
             new BotAuthorizationMiddleware(
                 azureUserGetFunc: azureUserGetFuncResolver.Invoke(context),
-                botUserGetFunc: botUserGetFuncResolver.Invoke(context),
+                botUserGetFunc: botUserGetFuncResolver?.Invoke(context) ?? BotUserGetFunc.Instance,
                 option: optionResolver.Invoke(context));
     }
 
