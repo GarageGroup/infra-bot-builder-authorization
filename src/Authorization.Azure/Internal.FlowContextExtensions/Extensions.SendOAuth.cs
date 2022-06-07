@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 
@@ -18,16 +19,15 @@ partial class OAuthFlowContextExtensions
             return new(notSupportedChannelFailure);
         }
 
-        return context.GetUserTokenPrividerOrFailure(option).ForwardValueAsync(InnerSendActivityAsync);
+        return context.GetUserTokenClientOrFailure(option).ForwardValueAsync(InnerSendActivityAsync);
 
-        async ValueTask<Result<ResourceResponse, BotFlowFailure>> InnerSendActivityAsync(IExtendedUserTokenProvider userTokenProvider)
+        async ValueTask<Result<ResourceResponse, BotFlowFailure>> InnerSendActivityAsync(UserTokenClient userTokenClient)
         {
             try
             {
-                var signInResource = await userTokenProvider.GetSignInResourceAsync(
-                    turnContext: context,
+                var signInResource = await userTokenClient.GetSignInResourceAsync(
                     connectionName: option.OAuthConnectionName,
-                    userId: context.Activity.From.Id,
+                    activity: context.Activity,
                     finalRedirect: default,
                     cancellationToken: cancellationToken).ConfigureAwait(false);
 

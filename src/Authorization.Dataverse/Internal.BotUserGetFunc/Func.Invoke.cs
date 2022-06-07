@@ -8,12 +8,14 @@ namespace GGroupp.Infra.Bot.Builder;
 partial class BotDataverseUserGetFunc
 {
     public ValueTask<Result<BotUser, BotFlowFailure>> InvokeAsync(AzureUserGetOut azureUser, CancellationToken cancellationToken = default)
-        =>
-        cancellationToken.IsCancellationRequested switch
+    {
+        if (cancellationToken.IsCancellationRequested)
         {
-            true => ValueTask.FromCanceled<Result<BotUser, BotFlowFailure>>(cancellationToken),
-            _ => InnerInvokeAsync(azureUser, cancellationToken)
-        };
+            return ValueTask.FromCanceled<Result<BotUser, BotFlowFailure>>(cancellationToken);
+        }
+
+        return InnerInvokeAsync(azureUser, cancellationToken);
+    }
 
     private async ValueTask<Result<BotUser, BotFlowFailure>> InnerInvokeAsync(AzureUserGetOut azureUser, CancellationToken cancellationToken)
     {

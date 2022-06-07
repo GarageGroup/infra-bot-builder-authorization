@@ -101,6 +101,8 @@ partial class BotAuthorizationMiddleware
 
         async ValueTask<Unit> SendOAuthCardOrBreakAsync(Unit _)
         {
+            botContext.BotTelemetryClient.TrackDialogView("UserSignIn");
+
             var sendResult = await flowContext.SendOAuthCardOrFailureAsync(option, cancellationToken).ConfigureAwait(false);
             return await sendResult.FoldValueAsync(SaveOAuthCardResourceAsync, BreakAsync).ConfigureAwait(false);
         }
