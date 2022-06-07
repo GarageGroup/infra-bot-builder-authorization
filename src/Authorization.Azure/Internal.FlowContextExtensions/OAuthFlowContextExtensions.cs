@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Connector;
+using Microsoft.Bot.Connector.Authentication;
 
 namespace GGroupp.Infra.Bot.Builder;
 
@@ -23,12 +24,12 @@ internal static partial class OAuthFlowContextExtensions
         =>
         notSupportedChannles.Contains(turnContext.Activity.ChannelId, StringComparer.InvariantCultureIgnoreCase);
 
-    private static Result<IExtendedUserTokenProvider, BotFlowFailure> GetUserTokenPrividerOrFailure(
-        this IOAuthFlowContext context, BotAuthorizationOption option)
+    private static Result<UserTokenClient, BotFlowFailure> GetUserTokenClientOrFailure(this IOAuthFlowContext context, BotAuthorizationOption option)
     {
-        if (context.Adapter is IExtendedUserTokenProvider adapter)
+        var userTokenClient = context.TurnState.Get<UserTokenClient>();
+        if (userTokenClient != null)
         {
-            return Result.Success(adapter);
+            return Result.Success(userTokenClient);
         }
 
         return new BotFlowFailure(

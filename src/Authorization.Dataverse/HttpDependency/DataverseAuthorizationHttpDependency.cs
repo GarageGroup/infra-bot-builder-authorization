@@ -6,18 +6,17 @@ namespace GGroupp.Infra.Bot.Builder;
 
 public static class DataverseAuthorizationHttpDependency
 {
-    public static Dependency<DelegatingHandler> UseDataverseImpersonation<THttpHandler>(
-        this Dependency<THttpHandler> dependency, IBotContext botContext)
-        where THttpHandler : HttpMessageHandler
-        =>
-        InnerUseDataverseImpersonation(
-            dependency ?? throw new ArgumentNullException(nameof(dependency)),
-            botContext ?? throw new ArgumentNullException(nameof(botContext)));
+    public static Dependency<HttpMessageHandler> UseDataverseImpersonation(this Dependency<HttpMessageHandler> dependency, IBotContext botContext)
+    {
+        _ = dependency ?? throw new ArgumentNullException(nameof(dependency));
+        _ = botContext ?? throw new ArgumentNullException(nameof(botContext));
 
-    private static Dependency<DelegatingHandler> InnerUseDataverseImpersonation<THttpHandler>(
-        Dependency<THttpHandler> dependency, IBotContext botContext)
-        where THttpHandler : HttpMessageHandler
-        =>
-        dependency.UseDataverseImpersonation(
-            _ => CallerIdProvider.InternalCreate(botContext.BotUserProvider));
+        return dependency.UseDataverseImpersonation(CreateCallerIdProvider).Map(AsMessageHandler);
+
+        IAsyncValueFunc<Guid> CreateCallerIdProvider(IServiceProvider _)
+            =>
+            CallerIdProvider.InternalCreate(botContext.BotUserProvider);
+
+        static HttpMessageHandler AsMessageHandler(DelegatingHandler handler) => handler;
+    }
 }

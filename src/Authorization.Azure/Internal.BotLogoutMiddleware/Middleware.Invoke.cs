@@ -34,6 +34,8 @@ partial class BotLogoutMiddleware
 
     private async ValueTask<Unit> LogoutAsync(IBotContext botContext, CancellationToken cancellationToken)
     {
+        botContext.BotTelemetryClient.TrackDialogView("UserSignOut");
+
         var user = await botContext.BotUserProvider.GetCurrentUserAsync(cancellationToken).ConfigureAwait(false);
         if (user is null)
         {

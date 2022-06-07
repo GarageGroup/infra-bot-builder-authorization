@@ -2,7 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Bot.Builder;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 
@@ -29,15 +29,16 @@ partial class OAuthFlowContextExtensions
             return GetUnsuccessfulTokenFailureResultAsync();
         }
 
-        return context.GetUserTokenPrividerOrFailure(option).ForwardValueAsync(InnerGetUserTokenOrFailureAsync);
+        return context.GetUserTokenClientOrFailure(option).ForwardValueAsync(InnerGetUserTokenOrFailureAsync);
 
-        async ValueTask<Result<TokenResponse, BotFlowFailure>> InnerGetUserTokenOrFailureAsync(IExtendedUserTokenProvider userTokenProvider)
+        async ValueTask<Result<TokenResponse, BotFlowFailure>> InnerGetUserTokenOrFailureAsync(UserTokenClient userTokenClient)
         {
             try
             {
-                var userToken = await userTokenProvider.GetUserTokenAsync(
-                    turnContext: context,
+                var userToken = await userTokenClient.GetUserTokenAsync(
+                    userId: context.Activity.From.Id,
                     connectionName: option.OAuthConnectionName,
+                    channelId: context.Activity.ChannelId,
                     magicCode: matchedMagicCode.Value,
                     cancellationToken: cancellationToken).ConfigureAwait(false);
 
