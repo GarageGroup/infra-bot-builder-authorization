@@ -42,6 +42,8 @@ partial class BotAuthorizationMiddleware
     private async ValueTask<Unit> AuthorizeInTeamsAsync(IBotContext botContext, CancellationToken cancellationToken)
     {
         var flowContext = CreateFlowContext(botContext);
+        botContext.BotTelemetryClient.TrackEvent(FlowId, flowContext.Activity.Id, "TeamsStart");
+
         var teamsResult = await flowContext.AuthorizeInTeamsAsync(botUserGetFunc, option, cancellationToken).ConfigureAwait(false);
 
         return await teamsResult.FoldValueAsync(NextForTeamsAsync, InnerOnFailureAsync).ConfigureAwait(false);
@@ -49,20 +51,26 @@ partial class BotAuthorizationMiddleware
         async ValueTask<Unit> NextForTeamsAsync(BotUser botUser)
         {
             _ = await botContext.BotUserProvider.SetCurrentUserAsync(botUser, cancellationToken).ConfigureAwait(false);
+
+            botContext.BotTelemetryClient.TrackEvent(FlowId, flowContext.Activity.Id, "TeamsComplete");
             return await botContext.BotFlow.NextAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        ValueTask<Unit> InnerOnFailureAsync(BotFlowFailure failure)
-            =>
-            OnFailureAsync(flowContext, failure, cancellationToken);
+        async ValueTask<Unit> InnerOnFailureAsync(BotFlowFailure failure)
+        {
+            var unit = await OnFailureAsync(flowContext, failure, cancellationToken).ConfigureAwait(false);
+
+            botContext.BotTelemetryClient.TrackEvent(FlowId, flowContext.Activity.Id, "TeamsBreak");
+            return unit;
+        }
     }
 
     private async ValueTask<Unit> AuthorizeNotTeamsAsync(IBotContext botContext, CancellationToken cancellationToken)
     {
         var flowContext = CreateFlowContext(botContext);
 
-        var sourceActivityAccessor = botContext.UserState.CreateProperty<Activity?>("__authSourceActivity");
-        var oAuthCardResourceAccessor = botContext.UserState.CreateProperty<ResourceResponse?>("__authCardResource");
+        var sourceActivityAccessor = botContext.ConversationState.CreateProperty<Activity?>("__authSourceActivity");
+        var oAuthCardResourceAccessor = botContext.ConversationState.CreateProperty<ResourceResponse?>("__authCardResource");
 
         var sourceActivity = await sourceActivityAccessor.GetAsync(flowContext, default, cancellationToken).ConfigureAwait(false);
         if (sourceActivity is not null)
@@ -72,6 +80,8 @@ partial class BotAuthorizationMiddleware
 
             return await sendFailureResult.FoldValueAsync(AzureAuthAsync, SendOAuthCardOrBreakAsync).ConfigureAwait(false);
         }
+
+        botContext.BotTelemetryClient.TrackEvent(FlowId, flowContext.Activity.Id, "Start");
 
         await sourceActivityAccessor.SetAsync(flowContext, flowContext.Activity, cancellationToken).ConfigureAwait(false);
         return await SendOAuthCardOrBreakAsync(default).ConfigureAwait(false);
@@ -96,13 +106,13 @@ partial class BotAuthorizationMiddleware
             var clearCacheTask = ClearCacheAsync();
 
             await Task.WhenAll(setCurrentUserTask, clearCacheTask).ConfigureAwait(false);
+
+            botContext.BotTelemetryClient.TrackEvent(FlowId, sourceActivity.Id, "Complete");
             return await botContext.BotFlow.NextAsync(sourceActivity, cancellationToken).ConfigureAwait(false);
         }
 
         async ValueTask<Unit> SendOAuthCardOrBreakAsync(Unit _)
         {
-            botContext.BotTelemetryClient.TrackDialogView("UserSignIn");
-
             var sendResult = await flowContext.SendOAuthCardOrFailureAsync(option, cancellationToken).ConfigureAwait(false);
             return await sendResult.FoldValueAsync(SaveOAuthCardResourceAsync, BreakAsync).ConfigureAwait(false);
         }
@@ -115,6 +125,8 @@ partial class BotAuthorizationMiddleware
             var onFailureTask = InnerOnFailureAsync(flowFailure).AsTask();
 
             await Task.WhenAll(clearCacheTask, onFailureTask).ConfigureAwait(false);
+
+            botContext.BotTelemetryClient.TrackEvent(FlowId, sourceActivity?.Id ?? flowContext.Activity.Id, "Break");
             return unit;
         }
 

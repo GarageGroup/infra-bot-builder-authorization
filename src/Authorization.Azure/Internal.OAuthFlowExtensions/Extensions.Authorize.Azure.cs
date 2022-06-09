@@ -9,7 +9,7 @@ namespace GGroupp.Infra.Bot.Builder;
 using IAzureUserGetFunc = IAsyncValueFunc<AzureUserMeGetIn, Result<AzureUserGetOut, Failure<AzureUserGetFailureCode>>>;
 using IBotUserGetFunc = IAsyncValueFunc<AzureUserGetOut, Result<BotUser, BotFlowFailure>>;
 
-partial class OAuthFlowContextExtensions
+partial class OAuthFlowExtensions
 {
     internal static async ValueTask<Result<BotUser, BotFlowFailure>> AuthorizeInAzureAsync(
         this IOAuthFlowContext context,

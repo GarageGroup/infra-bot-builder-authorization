@@ -9,6 +9,8 @@ using IBotUserGetFunc = IAsyncValueFunc<AzureUserGetOut, Result<BotUser, BotFlow
 
 internal sealed partial class BotAuthorizationMiddleware : IAsyncValueFunc<IBotContext, Unit>
 {
+    private const string FlowId = "UserSignIn";
+
     private readonly IAzureUserGetFunc azureUserGetFunc;
 
     private readonly IBotUserGetFunc botUserGetFunc;
