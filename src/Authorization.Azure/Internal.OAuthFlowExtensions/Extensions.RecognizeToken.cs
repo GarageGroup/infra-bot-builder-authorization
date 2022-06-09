@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GGroupp.Infra.Bot.Builder;
 
-partial class OAuthFlowContextExtensions
+partial class OAuthFlowExtensions
 {
     internal static ValueTask<Result<TokenResponse, BotFlowFailure>> RecognizeTokenOrFailureAsync(
         this IOAuthFlowContext context, BotAuthorizationOption option, CancellationToken cancellationToken)

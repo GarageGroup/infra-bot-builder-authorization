@@ -7,6 +7,8 @@ internal sealed partial class BotLogoutMiddleware : IAsyncValueFunc<IBotContext,
 {
     private const string DefaultCommandName = "logout";
 
+    private const string FlowId = "UserSignOut";
+
     private readonly string commandName;
 
     private readonly BotLogoutOption logoutOption;

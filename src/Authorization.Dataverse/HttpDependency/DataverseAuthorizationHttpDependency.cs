@@ -11,12 +11,10 @@ public static class DataverseAuthorizationHttpDependency
         _ = dependency ?? throw new ArgumentNullException(nameof(dependency));
         _ = botContext ?? throw new ArgumentNullException(nameof(botContext));
 
-        return dependency.UseDataverseImpersonation(CreateCallerIdProvider).Map(AsMessageHandler);
+        return dependency.UseDataverseImpersonation(CreateCallerIdProvider);
 
         IAsyncValueFunc<Guid> CreateCallerIdProvider(IServiceProvider _)
             =>
             CallerIdProvider.InternalCreate(botContext.BotUserProvider);
-
-        static HttpMessageHandler AsMessageHandler(DelegatingHandler handler) => handler;
     }
 }

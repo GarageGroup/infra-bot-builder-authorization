@@ -7,11 +7,11 @@ using Microsoft.Bot.Connector.Authentication;
 
 namespace GGroupp.Infra.Bot.Builder;
 
-internal static partial class OAuthFlowContextExtensions
+internal static partial class OAuthFlowExtensions
 {
     private static readonly IReadOnlyCollection<string> notSupportedChannles;
 
-    static OAuthFlowContextExtensions()
+    static OAuthFlowExtensions()
         =>
         notSupportedChannles = new[]
         {
