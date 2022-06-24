@@ -10,8 +10,8 @@ partial class OAuthFlowExtensions
         _ = await botContext.BotUserProvider.SetCurrentUserAsync(botUser, cancellationToken).ConfigureAwait(false);
 
         var turnContext = botContext.TurnContext;
-
         var conversation = turnContext.Activity?.GetConversationReference();
+
         await botContext.CreateConversationReferenceAccessor().SetAsync(turnContext, conversation, cancellationToken).ConfigureAwait(false);
     }
 }
