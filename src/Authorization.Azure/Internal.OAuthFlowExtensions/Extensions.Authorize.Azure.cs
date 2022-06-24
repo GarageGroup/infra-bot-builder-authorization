@@ -12,10 +12,9 @@ using IBotUserGetFunc = IAsyncValueFunc<AzureUserGetOut, Result<BotUser, BotFlow
 partial class OAuthFlowExtensions
 {
     internal static async ValueTask<Result<BotUser, BotFlowFailure>> AuthorizeInAzureAsync(
-        this IOAuthFlowContext context,
+        this TokenResponse tokenResponse,
         IAzureUserGetFunc azureUserGetFunc,
         IBotUserGetFunc botUserGetFunc,
-        TokenResponse tokenResponse,
         BotAuthorizationOption option,
         CancellationToken cancellationToken)
     {

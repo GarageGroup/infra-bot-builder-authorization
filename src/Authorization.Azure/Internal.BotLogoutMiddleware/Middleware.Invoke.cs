@@ -46,10 +46,7 @@ partial class BotLogoutMiddleware
             return default;
         }
 
-        _ = await botContext.BotUserProvider.SetCurrentUserAsync(default, cancellationToken).ConfigureAwait(false);
-
-        await botContext.UserState.ClearStateAsync(botContext.TurnContext, cancellationToken).ConfigureAwait(false);
-        await botContext.ConversationState.ClearStateAsync(botContext.TurnContext, cancellationToken).ConfigureAwait(false);
+        await ClearAuthDataAsync(botContext, cancellationToken).ConfigureAwait(false);
 
         var successActivity = MessageFactory.Text(logoutOption.SuccessMessage);
         if (botContext.TurnContext.IsTelegramChannel())
@@ -61,6 +58,14 @@ partial class BotLogoutMiddleware
         botContext.BotTelemetryClient.TrackEvent(FlowId, botContext.TurnContext.Activity.Id, "Complete");
 
         return default;
+    }
+
+    private static Task ClearAuthDataAsync(IBotContext botContext, CancellationToken cancellationToken)
+    {
+        var botUserClearTask = botContext.ClearBotUserAsync(cancellationToken);
+        var conversationStateClearTask = botContext.ConversationState.ClearStateAsync(botContext.TurnContext, cancellationToken);
+
+        return Task.WhenAll(botUserClearTask, conversationStateClearTask);
     }
 
     private static JObject CreateTelegramChannelData()

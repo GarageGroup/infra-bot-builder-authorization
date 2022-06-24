@@ -50,7 +50,7 @@ partial class BotAuthorizationMiddleware
 
         async ValueTask<Unit> NextForTeamsAsync(BotUser botUser)
         {
-            _ = await botContext.BotUserProvider.SetCurrentUserAsync(botUser, cancellationToken).ConfigureAwait(false);
+            await botContext.SetBotUserAsync(botUser, cancellationToken).ConfigureAwait(false);
 
             botContext.BotTelemetryClient.TrackEvent(FlowId, flowContext.Activity.Id, "TeamsComplete");
             return await botContext.BotFlow.NextAsync(cancellationToken).ConfigureAwait(false);
@@ -88,8 +88,8 @@ partial class BotAuthorizationMiddleware
 
         async ValueTask<Unit> AzureAuthAsync(TokenResponse tokenResponse)
         {
-            var azureResult = await flowContext.AuthorizeInAzureAsync(
-                azureUserGetFunc, botUserGetFunc, tokenResponse, option, cancellationToken).ConfigureAwait(false);
+            var azureResult = await tokenResponse.AuthorizeInAzureAsync(
+                azureUserGetFunc, botUserGetFunc, option, cancellationToken).ConfigureAwait(false);
 
             return await azureResult.FoldValueAsync(NextAsync, BreakAsync).ConfigureAwait(false);
         }
@@ -102,7 +102,7 @@ partial class BotAuthorizationMiddleware
             var replaceOAuthCardTask = ReplaceOAuthCardResourceAsync(default).AsTask();
             await Task.WhenAll(successActivityTask, replaceOAuthCardTask).ConfigureAwait(false);
 
-            var setCurrentUserTask = botContext.BotUserProvider.SetCurrentUserAsync(botUser, cancellationToken).AsTask();
+            var setCurrentUserTask = botContext.SetBotUserAsync(botUser, cancellationToken);
             var clearCacheTask = ClearCacheAsync();
 
             await Task.WhenAll(setCurrentUserTask, clearCacheTask).ConfigureAwait(false);
