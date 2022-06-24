@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
+using Microsoft.Bot.Schema;
 
 namespace GGroupp.Infra.Bot.Builder;
 
@@ -36,4 +37,8 @@ internal static partial class OAuthFlowExtensions
             userMessage: option.UnexpectedFailureMessage,
             logMessage: "UserTokenClient must be specified in the turn state");
     }
+
+    private static IStatePropertyAccessor<ConversationReference?> CreateConversationReferenceAccessor(this IBotContext botContext)
+        =>
+        botContext.UserState.CreateProperty<ConversationReference?>("__conversationReference");
 }
