@@ -7,5 +7,5 @@ partial class DataverseUserExtensions
 {
     internal static Optional<Guid> GetDataverseUserIdOrAbsent(this BotUser user)
         =>
-        user.Claims.GetValueOrAbsent(DataverseUserIdClaimName).Map(Guid.Parse);
+        user.Claims.AsEnumerable().GetValueOrAbsent(DataverseUserIdClaimName).Map(Guid.Parse);
 }

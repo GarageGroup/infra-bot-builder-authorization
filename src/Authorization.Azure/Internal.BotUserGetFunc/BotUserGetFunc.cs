@@ -1,5 +1,4 @@
 using System;
-using GGroupp.Platform;
 
 namespace GGroupp.Infra.Bot.Builder;
 
@@ -9,7 +8,9 @@ internal sealed partial class BotUserGetFunc : IBotUserGetFunc
 {
     public static BotUserGetFunc Instance { get; }
 
-    static BotUserGetFunc() => Instance = new();
+    static BotUserGetFunc()
+        =>
+        Instance = new();
 
     private BotUserGetFunc()
     {

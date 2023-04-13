@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
@@ -10,25 +8,14 @@ namespace GGroupp.Infra.Bot.Builder;
 
 internal static partial class OAuthFlowExtensions
 {
-    private static readonly IReadOnlyCollection<string> notSupportedChannles;
-
-    static OAuthFlowExtensions()
-        =>
-        notSupportedChannles = new[]
-        {
-            Channels.Cortana,
-            Channels.Skype,
-            Channels.Skypeforbusiness
-        };
-
     private static bool IsChannelNotSupported(this ITurnContext turnContext)
         =>
-        notSupportedChannles.Contains(turnContext.Activity.ChannelId, StringComparer.InvariantCultureIgnoreCase);
+        string.Equals(turnContext.Activity.ChannelId, Channels.Skype, StringComparison.InvariantCultureIgnoreCase);
 
     private static Result<UserTokenClient, BotFlowFailure> GetUserTokenClientOrFailure(this IOAuthFlowContext context, BotAuthorizationOption option)
     {
         var userTokenClient = context.TurnState.Get<UserTokenClient>();
-        if (userTokenClient != null)
+        if (userTokenClient is not null)
         {
             return Result.Success(userTokenClient);
         }

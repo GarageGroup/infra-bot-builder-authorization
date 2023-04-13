@@ -25,10 +25,10 @@ jobs:
 
     - name: Add GGroupp NuGet Source
       run: >
-        dotnet nuget add source ${{ secrets.GGROUPP_NUGET_SOURCE_URL }}
+        dotnet nuget add source ${{ secrets.GG_NUGET_SOURCE_URL }}
         -n ggroupp
-        -u ${{ secrets.GGROUPP_NUGET_SOURCE_USER_NAME }}
-        -p ${{ secrets.GGROUPP_NUGET_SOURCE_USER_PASSWORD }}
+        -u ${{ secrets.GG_NUGET_SOURCE_USER_NAME }}
+        -p ${{ secrets.GG_NUGET_SOURCE_USER_PASSWORD }}
         --store-password-in-clear-text
 
     # Authorization.Azure.csproj
@@ -59,6 +59,6 @@ jobs:
       if: ${{ github.ref == 'refs/heads/main' }}
       run: >
         dotnet nuget push "../../../nuget/*.nupkg"
-        -s ${{ secrets.GGROUPP_NUGET_SOURCE_URL }}
-        -k ${{ secrets.GGROUPP_NUGET_SOURCE_USER_PASSWORD }}
+        -s ${{ secrets.GG_NUGET_SOURCE_URL }}
+        -k ${{ secrets.GG_NUGET_SOURCE_USER_PASSWORD }}
         --skip-duplicate
