@@ -8,7 +8,7 @@ public static class LogoutBotBuilder
 {
     public static IBotBuilder UseLogout(this IBotBuilder botBuilder, string commandName)
     {
-        _ = botBuilder ?? throw new ArgumentNullException(nameof(botBuilder));
+        ArgumentNullException.ThrowIfNull(botBuilder);
         return botBuilder.Use(InnerInvokeAsync);
 
         ValueTask<Unit> InnerInvokeAsync(IBotContext context, CancellationToken token)
@@ -18,8 +18,8 @@ public static class LogoutBotBuilder
 
     public static IBotBuilder UseLogout(this IBotBuilder botBuilder, string commandName, Func<IBotContext, BotLogoutOption> optionResolver)
     {
-        _ = botBuilder ?? throw new ArgumentNullException(nameof(botBuilder));
-        _ = optionResolver ?? throw new ArgumentNullException(nameof(optionResolver));
+        ArgumentNullException.ThrowIfNull(botBuilder);
+        ArgumentNullException.ThrowIfNull(optionResolver);
 
         return botBuilder.Use(InnerInvokeAsync);
 
@@ -30,8 +30,8 @@ public static class LogoutBotBuilder
 
     public static IBotBuilder UseLogout(this IBotBuilder botBuilder, string commandName, Func<BotLogoutOption> optionFactory)
     {
-        _ = botBuilder ?? throw new ArgumentNullException(nameof(botBuilder));
-        _ = optionFactory ?? throw new ArgumentNullException(nameof(optionFactory));
+        ArgumentNullException.ThrowIfNull(botBuilder);
+        ArgumentNullException.ThrowIfNull(optionFactory);
 
         return botBuilder.Use(InnerInvokeAsync);
 

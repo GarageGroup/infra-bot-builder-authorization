@@ -1,19 +1,17 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GGroupp.Platform;
 using Microsoft.Bot.Schema;
 
 namespace GGroupp.Infra.Bot.Builder;
 
-using IAzureUserGetFunc = IAsyncValueFunc<AzureUserMeGetIn, Result<AzureUserGetOut, Failure<AzureUserGetFailureCode>>>;
 using IBotUserGetFunc = IAsyncValueFunc<AzureUserGetOut, Result<BotUser, BotFlowFailure>>;
 
 partial class OAuthFlowExtensions
 {
     internal static async ValueTask<Result<BotUser, BotFlowFailure>> AuthorizeInAzureAsync(
         this TokenResponse tokenResponse,
-        IAzureUserGetFunc azureUserGetFunc,
+        IAzureUserMeGetFunc azureUserGetFunc,
         IBotUserGetFunc botUserGetFunc,
         BotAuthorizationOption option,
         CancellationToken cancellationToken)
@@ -27,7 +25,7 @@ partial class OAuthFlowExtensions
             =>
             botUserGetFunc.InvokeAsync(azureUser, cancellationToken);
 
-        BotFlowFailure MapFailure(Failure<AzureUserGetFailureCode> failure)
+        BotFlowFailure MapFailure(Failure<Unit> failure)
             =>
             new(
                 userMessage: option.UnexpectedFailureMessage,

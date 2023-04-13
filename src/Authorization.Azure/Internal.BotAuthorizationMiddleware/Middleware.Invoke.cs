@@ -11,7 +11,7 @@ partial class BotAuthorizationMiddleware
 {
     public ValueTask<Unit> InvokeAsync(IBotContext botContext, CancellationToken cancellationToken = default)
     {
-        _ = botContext ?? throw new ArgumentNullException(nameof(botContext));
+        ArgumentNullException.ThrowIfNull(botContext);
 
         if (cancellationToken.IsCancellationRequested)
         {

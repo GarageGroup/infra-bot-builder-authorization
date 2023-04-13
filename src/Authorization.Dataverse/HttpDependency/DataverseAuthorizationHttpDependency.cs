@@ -8,8 +8,8 @@ public static class DataverseAuthorizationHttpDependency
 {
     public static Dependency<HttpMessageHandler> UseDataverseImpersonation(this Dependency<HttpMessageHandler> dependency, IBotContext botContext)
     {
-        _ = dependency ?? throw new ArgumentNullException(nameof(dependency));
-        _ = botContext ?? throw new ArgumentNullException(nameof(botContext));
+        ArgumentNullException.ThrowIfNull(dependency);
+        ArgumentNullException.ThrowIfNull(botContext);
 
         return dependency.UseDataverseImpersonation(CreateCallerIdProvider);
 

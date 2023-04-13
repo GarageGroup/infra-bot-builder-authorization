@@ -1,9 +1,7 @@
 using System;
-using GGroupp.Platform;
 
 namespace GGroupp.Infra.Bot.Builder;
 
-using IDataverseUserGetFunc = IAsyncValueFunc<DataverseUserGetIn, Result<DataverseUserGetOut, Failure<DataverseUserGetFailureCode>>>;
 using IBotUserGetFunc = IAsyncValueFunc<AzureUserGetOut, Result<BotUser, BotFlowFailure>>;
 
 internal sealed partial class BotDataverseUserGetFunc : IBotUserGetFunc

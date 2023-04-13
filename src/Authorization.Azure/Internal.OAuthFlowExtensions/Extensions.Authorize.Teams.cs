@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GGroupp.Platform;
 using Microsoft.Bot.Builder.Teams;
 using Microsoft.Extensions.Logging;
 
