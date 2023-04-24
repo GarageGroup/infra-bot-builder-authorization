@@ -44,7 +44,7 @@ partial class OAuthFlowExtensions
 
                 if (userToken is null)
                 {
-                    return new BotFlowFailure(option.UnsuccessfulTokenFailureMessage);
+                    return new BotFlowFailure(option.UnsuccessfulTokenFailureMessage, "User token is null");
                 }
 
                 return userToken;
@@ -52,7 +52,9 @@ partial class OAuthFlowExtensions
             catch (Exception ex)
             {
                 context.GetLogger().LogError(ex, "An unexpected exception was thrown by userTokenProvider.GetUserTokenAsync");
-                return new BotFlowFailure(option.UnexpectedFailureMessage);
+                return new BotFlowFailure(
+                    userMessage: option.UnexpectedFailureMessage,
+                    logMessage: $"An unexpected exception {ex.GetType().FullName} was thrown: {ex.Message}");
             }
         }
 

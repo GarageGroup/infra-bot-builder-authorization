@@ -15,7 +15,10 @@ partial class OAuthFlowExtensions
     {
         if (context.IsChannelNotSupported())
         {
-            var notSupportedChannelFailure = new BotFlowFailure(option.UnexpectedFailureMessage);
+            var notSupportedChannelFailure = new BotFlowFailure(
+                option.UnexpectedFailureMessage,
+                $"Channel {context.Activity.ChannelId} is not supported");
+
             return new(notSupportedChannelFailure);
         }
 
@@ -37,7 +40,9 @@ partial class OAuthFlowExtensions
             catch (Exception ex)
             {
                 context.GetLogger().LogError(ex, "An unexpected exception was thrown by UserTokenClient.GetSignInResourceAsync");
-                return new BotFlowFailure(option.UnexpectedFailureMessage);
+                return new BotFlowFailure(
+                    userMessage: option.UnexpectedFailureMessage,
+                    logMessage: $"An unexpected exception {ex.GetType().FullName} was thrown: {ex.Message}");
             }
         }
     }
