@@ -38,7 +38,8 @@ partial class OAuthFlowExtensions
         {
             logger.LogError(ex, "Authorization in Teams has finished with an unexpected exception");
             return new BotFlowFailure(
-                userMessage: option.UnexpectedFailureMessage);
+                userMessage: option.UnexpectedFailureMessage,
+                logMessage: $"Authorization in Teams has finished with an unexpected exception {ex.GetType().FullName}: {ex.Message}");
         }
     }
 }

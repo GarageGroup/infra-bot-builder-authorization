@@ -29,7 +29,7 @@ partial class BotDataverseUserGetFunc
             =>
             new(
                 userMessage: GetUserMessage(failure.FailureCode),
-                logMessage: $"Dataverse authoriation has failed with message: {failure.FailureMessage}");
+                logMessage: $"Dataverse authoriation has failed with a message: {failure.FailureMessage}");
     }
 
     private static string GetUserMessage(DataverseUserGetFailureCode failureCode)
