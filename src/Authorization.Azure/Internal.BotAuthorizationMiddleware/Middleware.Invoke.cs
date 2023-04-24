@@ -60,7 +60,7 @@ partial class BotAuthorizationMiddleware
         {
             var unit = await OnFailureAsync(flowContext, failure, cancellationToken).ConfigureAwait(false);
 
-            botContext.BotTelemetryClient.TrackEvent(FlowId, flowContext.Activity.Id, "TeamsBreak");
+            botContext.BotTelemetryClient.TrackEvent(FlowId, flowContext.Activity.Id, "TeamsBreak", failure.LogMessage);
             return unit;
         }
     }
@@ -126,7 +126,7 @@ partial class BotAuthorizationMiddleware
 
             await Task.WhenAll(clearCacheTask, onFailureTask).ConfigureAwait(false);
 
-            botContext.BotTelemetryClient.TrackEvent(FlowId, sourceActivity?.Id ?? flowContext.Activity.Id, "Break");
+            botContext.BotTelemetryClient.TrackEvent(FlowId, sourceActivity?.Id ?? flowContext.Activity.Id, "Break", flowFailure.LogMessage);
             return unit;
         }
 
