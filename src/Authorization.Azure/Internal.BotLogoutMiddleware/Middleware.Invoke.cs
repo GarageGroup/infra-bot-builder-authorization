@@ -34,15 +34,11 @@ partial class BotLogoutMiddleware
 
     private async ValueTask<Unit> LogoutAsync(IBotContext botContext, CancellationToken cancellationToken)
     {
-        botContext.BotTelemetryClient.TrackEvent(FlowId, botContext.TurnContext.Activity.Id, "Start");
-
         var user = await botContext.BotUserProvider.GetCurrentUserAsync(cancellationToken).ConfigureAwait(false);
         if (user is null)
         {
             var activity = MessageFactory.Text(logoutOption.UserNotAuthorizedMessage);
             _ = await botContext.TurnContext.SendActivityAsync(activity, cancellationToken).ConfigureAwait(false);
-
-            botContext.BotTelemetryClient.TrackEvent(FlowId, botContext.TurnContext.Activity.Id, "NotAuthorized");
             return default;
         }
 
@@ -55,8 +51,6 @@ partial class BotLogoutMiddleware
         }
 
         _ = await botContext.TurnContext.SendActivityAsync(successActivity, cancellationToken).ConfigureAwait(false);
-        botContext.BotTelemetryClient.TrackEvent(FlowId, botContext.TurnContext.Activity.Id, "Complete");
-
         return default;
     }
 

@@ -5,18 +5,15 @@ namespace GGroupp.Infra.Bot.Builder;
 
 partial class OAuthFlowExtensions
 {
-    internal static void TrackEvent(this IBotTelemetryClient client, string flowId, string instanceId, string eventName, string? eventMessage = null)
+    internal static void TrackEvent(this IBotTelemetryClient client, string flowId, string instanceId, string eventName, string eventMessage)
     {
         var properties = new Dictionary<string, string>
         {
-            { "FlowId", flowId },
-            { "InstanceId", instanceId },
+            ["FlowId"] = flowId,
+            ["InstanceId"] = instanceId,
+            ["Event"] = eventName,
+            ["Message"] = eventMessage
         };
-
-        if (string.IsNullOrEmpty(eventMessage) is false)
-        {
-            properties.Add("Message", eventMessage);
-        }
 
         client.TrackEvent(flowId + eventName, properties);
     }
