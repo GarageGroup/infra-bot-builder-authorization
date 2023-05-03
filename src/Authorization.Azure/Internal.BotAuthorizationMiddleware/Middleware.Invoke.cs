@@ -64,6 +64,7 @@ partial class BotAuthorizationMiddleware
     private async ValueTask<Unit> AuthorizeNotTeamsAsync(IBotContext botContext, CancellationToken cancellationToken)
     {
         var flowContext = CreateFlowContext(botContext);
+        _ = await flowContext.SetTypingStatusAsync(cancellationToken).ConfigureAwait(false);
 
         var sourceActivityAccessor = botContext.ConversationState.CreateProperty<Activity?>("__authSourceActivity");
         var oAuthCardResourceAccessor = botContext.ConversationState.CreateProperty<ResourceResponse?>("__authCardResource");
