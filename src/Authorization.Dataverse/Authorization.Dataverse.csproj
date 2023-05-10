@@ -8,11 +8,11 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RootNamespace>GarageGroup.Infra.Bot.Builder</RootNamespace>
     <AssemblyName>GarageGroup.Infra.Bot.Builder.Authorization.Dataverse</AssemblyName>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GarageGroup.Infra.Bot.Builder.Authorization.Azure" Version="0.0.1" />
+    <PackageReference Include="GarageGroup.Infra.Bot.Builder.Authorization.Azure" Version="0.0.2" />
     <PackageReference Include="GGroupp.Infra.Dataverse.Api.Impersonation" Version="2.1.0" />
     <PackageReference Include="GGroupp.Infra.Dataverse.DataverseUser.Get.InOut" Version="1.0.0" />
   </ItemGroup>
