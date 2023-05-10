@@ -1,8 +1,9 @@
 using System;
 using System.Net.Http;
+using GGroupp.Infra;
 using PrimeFuncPack;
 
-namespace GGroupp.Infra.Bot.Builder;
+namespace GarageGroup.Infra.Bot.Builder;
 
 public static class DataverseAuthorizationHttpDependency
 {

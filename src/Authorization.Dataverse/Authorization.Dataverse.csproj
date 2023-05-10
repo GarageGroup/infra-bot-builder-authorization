@@ -6,13 +6,13 @@
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RootNamespace>GGroupp.Infra.Bot.Builder</RootNamespace>
-    <AssemblyName>GGroupp.Infra.Bot.Builder.Authorization.Dataverse</AssemblyName>
-    <Version>2.1.0</Version>
+    <RootNamespace>GarageGroup.Infra.Bot.Builder</RootNamespace>
+    <AssemblyName>GarageGroup.Infra.Bot.Builder.Authorization.Dataverse</AssemblyName>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GGroupp.Infra.Bot.Builder.Authorization.Azure" Version="2.1.0" />
+    <PackageReference Include="GarageGroup.Infra.Bot.Builder.Authorization.Azure" Version="0.0.1" />
     <PackageReference Include="GGroupp.Infra.Dataverse.Api.Impersonation" Version="2.1.0" />
     <PackageReference Include="GGroupp.Infra.Dataverse.DataverseUser.Get.InOut" Version="1.0.0" />
   </ItemGroup>
