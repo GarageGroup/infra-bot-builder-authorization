@@ -9,10 +9,10 @@ partial class OAuthFlowExtensions
     {
         var properties = new Dictionary<string, string>
         {
-            ["FlowId"] = flowId,
-            ["InstanceId"] = instanceId,
-            ["Event"] = eventName,
-            ["Message"] = eventMessage
+            ["flowId"] = flowId,
+            ["instanceId"] = instanceId,
+            ["event"] = eventName,
+            ["message"] = eventMessage
         };
 
         client.TrackEvent(flowId + eventName, properties);
