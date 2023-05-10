@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.Bot.Builder;
 
-namespace GGroupp.Infra.Bot.Builder;
+namespace GarageGroup.Infra.Bot.Builder;
 
 partial class OAuthFlowExtensions
 {

@@ -6,17 +6,17 @@
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RootNamespace>GGroupp.Infra.Bot.Builder</RootNamespace>
-    <AssemblyName>GGroupp.Infra.Bot.Builder.Authorization.Azure</AssemblyName>
-    <Version>2.1.0</Version>
+    <RootNamespace>GarageGroup.Infra.Bot.Builder</RootNamespace>
+    <AssemblyName>GarageGroup.Infra.Bot.Builder.Authorization.Azure</AssemblyName>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="GGroupp.Infra.Azure.Services.AzureUser.Get.InOut" Version="1.0.0" />
-    <PackageReference Include="GGroupp.Infra.Bot.Builder.Core" Version="2.0.0" />
-    <PackageReference Include="GGroupp.Infra.Bot.Builder.FlowFailure" Version="1.0.1" />
-    <PackageReference Include="GGroupp.Infra.Bot.Builder.Telegram.ChannelData" Version="1.0.2" />
-    <PackageReference Include="GGroupp.Infra.Bot.Builder.TurnContext.Extensions" Version="1.4.0" />
+    <PackageReference Include="GarageGroup.Infra.Bot.Builder.Core" Version="0.0.1" />
+    <PackageReference Include="GarageGroup.Infra.Bot.Builder.FlowFailure" Version="0.0.1" />
+    <PackageReference Include="GarageGroup.Infra.Bot.Builder.Telegram.ChannelData" Version="0.0.1" />
+    <PackageReference Include="GarageGroup.Infra.Bot.Builder.TurnContext.Extensions" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
