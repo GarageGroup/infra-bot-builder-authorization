@@ -11,18 +11,18 @@ public static class DataverseAuthorizationBotBuilder
         this IBotBuilder botBuilder,
         Func<IBotContext, BotAuthorizationOption> optionResolver,
         Func<IBotContext, IAzureUserMeGetFunc> azureUserGetFuncResolver,
-        Func<IBotContext, IDataverseUserGetFunc> dataverseUserGetFuncResolver)
+        Func<IBotContext, IDataverseUserGetSupplier> dataverseUserApiResolver)
     {
         ArgumentNullException.ThrowIfNull(botBuilder);
         ArgumentNullException.ThrowIfNull(optionResolver);
         ArgumentNullException.ThrowIfNull(azureUserGetFuncResolver);
-        ArgumentNullException.ThrowIfNull(dataverseUserGetFuncResolver);
+        ArgumentNullException.ThrowIfNull(dataverseUserApiResolver);
 
         return botBuilder.UseAuthorization(optionResolver, azureUserGetFuncResolver, InnerResolveBotUserGetFunc);
 
         IBotUserGetFunc InnerResolveBotUserGetFunc(IBotContext botContext)
             =>
             new BotDataverseUserGetFunc(
-                dataverseUserGetFunc: dataverseUserGetFuncResolver.Invoke(botContext));
+                dataverseUserApi: dataverseUserApiResolver.Invoke(botContext));
     }
 }

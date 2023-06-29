@@ -9,15 +9,15 @@ internal sealed partial class BotDataverseUserGetFunc : IBotUserGetFunc
 {
     private const string UserNotFoundFailureMessage
         =
-        "Пользователь не найден. Возможно у вас нет прав для доступа в систему";
+        "User not found. You may not have the rights to access the system";
 
     private const string UnexpectedFailureMessage
         =
-        "Возникла непредвиденная ошибка при попытке обращения в Dataverse. Повторите попытку позже или обратитесь к администратору";
+        "An unexpected error occurred when trying to access Dataverse. Please try again later or contact the administrator";
 
-    private readonly IDataverseUserGetFunc dataverseUserGetFunc;
+    private readonly IDataverseUserGetSupplier dataverseUserApi;
 
-    internal BotDataverseUserGetFunc(IDataverseUserGetFunc dataverseUserGetFunc)
+    internal BotDataverseUserGetFunc(IDataverseUserGetSupplier dataverseUserApi)
         =>
-        this.dataverseUserGetFunc = dataverseUserGetFunc;
+        this.dataverseUserApi = dataverseUserApi;
 }
