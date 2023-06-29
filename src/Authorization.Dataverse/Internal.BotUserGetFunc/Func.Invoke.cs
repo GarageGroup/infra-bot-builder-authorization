@@ -19,7 +19,7 @@ partial class BotDataverseUserGetFunc
 
     private async ValueTask<Result<BotUser, BotFlowFailure>> InnerInvokeAsync(AzureUserGetOut azureUser, CancellationToken cancellationToken)
     {
-        var dataverseResult = await dataverseUserGetFunc.InvokeAsync(new(azureUser.Id), cancellationToken).ConfigureAwait(false);
+        var dataverseResult = await dataverseUserApi.GetUserAsync(new(azureUser.Id), cancellationToken).ConfigureAwait(false);
         return dataverseResult.Map(MapDataverseUser, MapFailure);
 
         BotUser MapDataverseUser(DataverseUserGetOut dataverseUser)
