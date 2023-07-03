@@ -1,5 +1,4 @@
 using System;
-using GGroupp.Infra;
 using Microsoft.Extensions.Logging;
 
 namespace GarageGroup.Infra.Bot.Builder;
@@ -10,15 +9,15 @@ internal sealed partial class BotAuthorizationMiddleware : IAsyncValueFunc<IBotC
 {
     private const string FlowId = "UserSignIn";
 
-    private readonly IAzureUserMeGetFunc azureUserGetFunc;
+    private readonly IAzureUserGetSupplier azureUserApi;
 
     private readonly IBotUserGetFunc botUserGetFunc;
 
     private readonly BotAuthorizationOption option;
 
-    internal BotAuthorizationMiddleware(IAzureUserMeGetFunc azureUserGetFunc, IBotUserGetFunc botUserGetFunc, BotAuthorizationOption option)
+    internal BotAuthorizationMiddleware(IAzureUserGetSupplier azureUserApi, IBotUserGetFunc botUserGetFunc, BotAuthorizationOption option)
     {
-        this.azureUserGetFunc = azureUserGetFunc;
+        this.azureUserApi = azureUserApi;
         this.botUserGetFunc = botUserGetFunc;
         this.option = option;
     }

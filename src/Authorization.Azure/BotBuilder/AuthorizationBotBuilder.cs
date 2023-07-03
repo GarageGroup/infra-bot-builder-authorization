@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GGroupp.Infra;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,33 +13,33 @@ public static class AuthorizationBotBuilder
     public static IBotBuilder UseAuthorization(
         this IBotBuilder botBuilder,
         Func<IBotContext, BotAuthorizationOption> optionResolver,
-        Func<IBotContext, IAzureUserMeGetFunc> azureUserGetFuncResolver,
+        Func<IBotContext, IAzureUserGetSupplier> azureUserApiResolver,
         Func<IBotContext, IBotUserGetFunc> botUserGetFuncResolver)
     {
         ArgumentNullException.ThrowIfNull(botBuilder);
         ArgumentNullException.ThrowIfNull(optionResolver);
-        ArgumentNullException.ThrowIfNull(azureUserGetFuncResolver);
+        ArgumentNullException.ThrowIfNull(azureUserApiResolver);
         ArgumentNullException.ThrowIfNull(botUserGetFuncResolver);
 
-        return InnerUseAuthorization(botBuilder, optionResolver, azureUserGetFuncResolver, botUserGetFuncResolver);
+        return InnerUseAuthorization(botBuilder, optionResolver, azureUserApiResolver, botUserGetFuncResolver);
     }
 
     public static IBotBuilder UseAuthorization(
         this IBotBuilder botBuilder,
         Func<IBotContext, BotAuthorizationOption> optionResolver,
-        Func<IBotContext, IAzureUserMeGetFunc> azureUserGetFuncResolver)
+        Func<IBotContext, IAzureUserGetSupplier> azureUserApiResolver)
     {
         ArgumentNullException.ThrowIfNull(botBuilder);
         ArgumentNullException.ThrowIfNull(optionResolver);
-        ArgumentNullException.ThrowIfNull(azureUserGetFuncResolver);
+        ArgumentNullException.ThrowIfNull(azureUserApiResolver);
 
-        return InnerUseAuthorization(botBuilder, optionResolver, azureUserGetFuncResolver);
+        return InnerUseAuthorization(botBuilder, optionResolver, azureUserApiResolver);
     }
 
     private static IBotBuilder InnerUseAuthorization(
         IBotBuilder botBuilder,
         Func<IBotContext, BotAuthorizationOption> optionResolver,
-        Func<IBotContext, IAzureUserMeGetFunc> azureUserGetFuncResolver,
+        Func<IBotContext, IAzureUserGetSupplier> azureUserApiResolver,
         Func<IBotContext, IBotUserGetFunc>? botUserGetFuncResolver = null)
     {
         return botBuilder.Use(InnerInvokeAsync);
@@ -52,7 +51,7 @@ public static class AuthorizationBotBuilder
         IAsyncValueFunc<IBotContext, Unit> InnerResolveMiddleware(IBotContext context)
             =>
             new BotAuthorizationMiddleware(
-                azureUserGetFunc: azureUserGetFuncResolver.Invoke(context),
+                azureUserApi: azureUserApiResolver.Invoke(context),
                 botUserGetFunc: botUserGetFuncResolver?.Invoke(context) ?? BotUserGetFunc.Instance,
                 option: optionResolver.Invoke(context));
     }

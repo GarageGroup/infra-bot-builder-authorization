@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GGroupp.Infra;
 using Microsoft.Bot.Schema;
 
 namespace GarageGroup.Infra.Bot.Builder;
@@ -12,13 +11,13 @@ partial class OAuthFlowExtensions
 {
     internal static async ValueTask<Result<BotUser, BotFlowFailure>> AuthorizeInAzureAsync(
         this TokenResponse tokenResponse,
-        IAzureUserMeGetFunc azureUserGetFunc,
+        IAzureUserGetSupplier azureUserApi,
         IBotUserGetFunc botUserGetFunc,
         BotAuthorizationOption option,
         CancellationToken cancellationToken)
     {
         var azureIn = new AzureUserMeGetIn(tokenResponse.Token);
-        var azureResult = await azureUserGetFunc.InvokeAsync(azureIn, cancellationToken).ConfigureAwait(false);
+        var azureResult = await azureUserApi.GetUserAsync(azureIn, cancellationToken).ConfigureAwait(false);
 
         return await azureResult.MapFailure(MapFailure).ForwardValueAsync(ToBotUserAsync).ConfigureAwait(false);
 
