@@ -1,5 +1,4 @@
 using System;
-using GGroupp.Infra;
 
 namespace GarageGroup.Infra.Bot.Builder;
 
@@ -10,15 +9,15 @@ public static class DataverseAuthorizationBotBuilder
     public static IBotBuilder UseDataverseAuthorization(
         this IBotBuilder botBuilder,
         Func<IBotContext, BotAuthorizationOption> optionResolver,
-        Func<IBotContext, IAzureUserMeGetFunc> azureUserGetFuncResolver,
+        Func<IBotContext, IAzureUserGetSupplier> azureUserApiResolver,
         Func<IBotContext, IDataverseUserGetSupplier> dataverseUserApiResolver)
     {
         ArgumentNullException.ThrowIfNull(botBuilder);
         ArgumentNullException.ThrowIfNull(optionResolver);
-        ArgumentNullException.ThrowIfNull(azureUserGetFuncResolver);
+        ArgumentNullException.ThrowIfNull(azureUserApiResolver);
         ArgumentNullException.ThrowIfNull(dataverseUserApiResolver);
 
-        return botBuilder.UseAuthorization(optionResolver, azureUserGetFuncResolver, InnerResolveBotUserGetFunc);
+        return botBuilder.UseAuthorization(optionResolver, azureUserApiResolver, InnerResolveBotUserGetFunc);
 
         IBotUserGetFunc InnerResolveBotUserGetFunc(IBotContext botContext)
             =>

@@ -84,7 +84,7 @@ partial class BotAuthorizationMiddleware
         async ValueTask<Unit> AzureAuthAsync(TokenResponse tokenResponse)
         {
             var azureResult = await tokenResponse.AuthorizeInAzureAsync(
-                azureUserGetFunc, botUserGetFunc, option, cancellationToken).ConfigureAwait(false);
+                azureUserApi, botUserGetFunc, option, cancellationToken).ConfigureAwait(false);
 
             return await azureResult.FoldValueAsync(NextAsync, BreakAsync).ConfigureAwait(false);
         }
