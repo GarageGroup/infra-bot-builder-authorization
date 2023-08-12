@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Teams;
-using Microsoft.Extensions.Logging;
 
 namespace GarageGroup.Infra.Bot.Builder;
 
@@ -13,8 +12,6 @@ partial class OAuthFlowExtensions
     internal static async ValueTask<Result<BotUser, BotFlowFailure>> AuthorizeInTeamsAsync(
         this IOAuthFlowContext context, IBotUserGetFunc botUserGetFunc, BotAuthorizationOption option, CancellationToken cancellationToken)
     {
-        var logger = context.GetLogger();
-
         try
         {
             var memberId = context.Activity.From.Id;
@@ -36,8 +33,7 @@ partial class OAuthFlowExtensions
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Authorization in Teams has finished with an unexpected exception");
-            return new BotFlowFailure(
+            return ex.ToBotFlowFailure(
                 userMessage: option.UnexpectedFailureMessage,
                 logMessage: $"Authorization in Teams has finished with an unexpected exception {ex.GetType().FullName}: {ex.Message}");
         }

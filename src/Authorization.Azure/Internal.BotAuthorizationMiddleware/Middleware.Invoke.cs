@@ -55,8 +55,8 @@ partial class BotAuthorizationMiddleware
         async ValueTask<Unit> InnerOnFailureAsync(BotFlowFailure failure)
         {
             var unit = await OnFailureAsync(flowContext, failure, cancellationToken).ConfigureAwait(false);
+            botContext.BotTelemetryClient.TrackEvent(FlowId, flowContext.Activity.Id, "TeamsBreak", failure.LogMessage, failure.SourceException);
 
-            botContext.BotTelemetryClient.TrackEvent(FlowId, flowContext.Activity.Id, "TeamsBreak", failure.LogMessage);
             return unit;
         }
     }
@@ -119,7 +119,9 @@ partial class BotAuthorizationMiddleware
 
             await Task.WhenAll(clearCacheTask, onFailureTask).ConfigureAwait(false);
 
-            botContext.BotTelemetryClient.TrackEvent(FlowId, sourceActivity?.Id ?? flowContext.Activity.Id, "Break", flowFailure.LogMessage);
+            botContext.BotTelemetryClient.TrackEvent(
+                FlowId, sourceActivity?.Id ?? flowContext.Activity.Id, "Break", flowFailure.LogMessage, flowFailure.SourceException);
+
             return unit;
         }
 
@@ -171,9 +173,9 @@ partial class BotAuthorizationMiddleware
             _ = await flowContext.SendActivityAsync(failureActivity, cancellationToken).ConfigureAwait(false);
         }
 
-        if (string.IsNullOrEmpty(failure.LogMessage) is false)
+        if (string.IsNullOrEmpty(failure.LogMessage) is false || failure.SourceException is not null)
         {
-            flowContext.GetLogger().LogError("{logMessage}", failure.LogMessage);
+            flowContext.GetLogger().LogError(failure.SourceException, "{logMessage}", failure.LogMessage);
         }
 
         return default;

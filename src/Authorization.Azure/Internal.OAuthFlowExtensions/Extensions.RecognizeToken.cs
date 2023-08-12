@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
-using Microsoft.Extensions.Logging;
 
 namespace GarageGroup.Infra.Bot.Builder;
 
@@ -51,8 +50,7 @@ partial class OAuthFlowExtensions
             }
             catch (Exception ex)
             {
-                context.GetLogger().LogError(ex, "An unexpected exception was thrown by userTokenProvider.GetUserTokenAsync");
-                return new BotFlowFailure(
+                return ex.ToBotFlowFailure(
                     userMessage: option.UnexpectedFailureMessage,
                     logMessage: $"An unexpected exception {ex.GetType().FullName} was thrown: {ex.Message}");
             }
