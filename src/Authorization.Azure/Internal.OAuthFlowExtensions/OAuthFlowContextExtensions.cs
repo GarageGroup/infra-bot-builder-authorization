@@ -12,7 +12,8 @@ internal static partial class OAuthFlowExtensions
         =>
         string.Equals(turnContext.Activity.ChannelId, Channels.Skype, StringComparison.InvariantCultureIgnoreCase);
 
-    private static Result<UserTokenClient, BotFlowFailure> GetUserTokenClientOrFailure(this IOAuthFlowContext context, BotAuthorizationOption option)
+    private static Result<UserTokenClient, BotFlowFailure> GetUserTokenClientOrFailure(
+        this IOAuthFlowContext context, BotAuthorizationOption option)
     {
         var userTokenClient = context.TurnState.Get<UserTokenClient>();
         if (userTokenClient is not null)

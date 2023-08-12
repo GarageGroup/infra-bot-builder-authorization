@@ -8,13 +8,13 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RootNamespace>GarageGroup.Infra.Bot.Builder</RootNamespace>
     <AssemblyName>GarageGroup.Infra.Bot.Builder.Authorization.Azure</AssemblyName>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GarageGroup.Infra.Azure.Services.AzureUser.Api.Contract.UserGet" Version="0.0.1" />
-    <PackageReference Include="GarageGroup.Infra.Bot.Builder.Core" Version="0.0.1" />
-    <PackageReference Include="GarageGroup.Infra.Bot.Builder.FlowFailure" Version="0.0.1" />
+    <PackageReference Include="GarageGroup.Infra.Azure.Services.AzureUser.Api.Contract.User.Get" Version="0.1.0" />
+    <PackageReference Include="GarageGroup.Infra.Bot.Builder.Core" Version="0.1.0" />
+    <PackageReference Include="GarageGroup.Infra.Bot.Builder.FlowFailure" Version="0.1.0" />
     <PackageReference Include="GarageGroup.Infra.Bot.Builder.Telegram.ChannelData" Version="0.0.1" />
     <PackageReference Include="GarageGroup.Infra.Bot.Builder.TurnContext.Extensions" Version="1.0.0" />
   </ItemGroup>

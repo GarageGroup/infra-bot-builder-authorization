@@ -29,6 +29,9 @@ partial class OAuthFlowExtensions
             =>
             new(
                 userMessage: option.UnexpectedFailureMessage,
-                logMessage: $"Azure authoriation has failed with message: {failure.FailureMessage}");
+                logMessage: $"Azure authoriation has failed with message: {failure.FailureMessage}")
+            {
+                SourceException = failure.SourceException
+            };
     }
 }
